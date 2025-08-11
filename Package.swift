@@ -4,18 +4,31 @@
 import PackageDescription
 
 let package = Package(
-    name: "swiftui-codemirror",
-    products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "swiftui-codemirror",
-            targets: ["swiftui-codemirror"]),
+    name: "CodeMirror",
+    platforms: [
+        .iOS(.v14),
+        .macOS(.v11),
     ],
+    products: [
+        .library(
+            name: "CodeMirror",
+            targets: ["CodeMirror"]
+        )
+    ],
+    dependencies: [],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "swiftui-codemirror"),
-
+            name: "CodeMirror",
+            exclude: [
+                "html/codemirror.js",
+                "html/node_modules",
+                "html/package-lock.json",
+                "html/package.json",
+                "html/rollup.config.mjs",
+            ],
+            resources: [
+                .copy("html/web.bundle")
+            ]
+        )
     ]
 )

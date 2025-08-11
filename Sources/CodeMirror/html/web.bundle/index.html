@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    <style>
+      html, body { margin: 0px; padding: 0px; width: 100%; height: 100%; }
+      body { user-select: none; -webkit-user-select: none; }
+      .cm-editor { width: 100%; height: 100%; }
+      .cm-scroller { overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <script src="./codemirror.bundle.js"></script>
+    <script>
+      if (window.webkit) {
+        window.webkit.messageHandlers.codeMirrorDidReady.postMessage(null);
+        CodeMirror.setListener(() => {
+          window.webkit.messageHandlers.codeMirrorContentDidChange.postMessage(
+            null
+          );
+        });
+      }
+    </script>
+  </body>
+</html>
