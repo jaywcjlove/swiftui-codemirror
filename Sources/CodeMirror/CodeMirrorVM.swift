@@ -29,6 +29,7 @@ public enum Language: String, CaseIterable, Hashable {
     case pgsql
     case liquid
     case wast
+    case swift
     case txt
 }
 

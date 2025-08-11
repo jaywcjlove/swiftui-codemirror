@@ -2,6 +2,7 @@ import * as CodeMirror from "codemirror";
 import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
+import { StreamLanguage } from '@codemirror/language';
 import { javascript } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { json } from "@codemirror/lang-json";
@@ -20,6 +21,8 @@ import { vue } from '@codemirror/lang-vue';
 import { java } from '@codemirror/lang-java';
 import { sql, MySQL, PostgreSQL } from '@codemirror/lang-sql';
 import { python } from '@codemirror/lang-python';
+import { swift } from '@codemirror/legacy-modes/mode/swift';
+
 import { oneDark } from "@codemirror/theme-one-dark";
 
 import { abcdef } from '@uiw/codemirror-theme-abcdef';
@@ -116,6 +119,7 @@ const SUPPORTED_LANGUAGES_MAP = {
   pgsql: () => sql({ dialect: PostgreSQL }),
   liquid,
   wast,
+  swift: () => StreamLanguage.define(swift),
   txt: () => [],
 };
 

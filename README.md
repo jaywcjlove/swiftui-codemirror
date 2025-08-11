@@ -33,6 +33,8 @@
 CodeMirror
 ===
 
+![CodeMirror for macOS/iOS](https://github.com/user-attachments/assets/2d25564c-bb2b-4297-a4c5-1db03d13a5ce)
+
 SwiftUI wrapper for CodeMirror 6.
 
 ## Features

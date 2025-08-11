@@ -20,6 +20,7 @@
     "@codemirror/lang-sql": "^6.0.0",
     "@codemirror/lang-xml": "^6.0.0",
     "@codemirror/language-data": "^6.0.0",
+    "@codemirror/legacy-modes": "^6.5.1",
     "@codemirror/theme-one-dark": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.0",
