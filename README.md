@@ -177,7 +177,9 @@ struct ContentView: View {
     var body: some View {
         CodeMirror(value: $value)
             .cmTheme($theme)
-            .cmTheme(colorScheme == .dark ? .constant(.vscodedark) : .constant(.vscodelight))
+            .cmTheme(
+                colorScheme == .dark ? .constant(.vscodedark) : .constant(.vscodelight)
+            )
     }
 }
 ```
