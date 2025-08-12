@@ -247,6 +247,10 @@ function setLanguage(lang) {
 }
 
 function setContent(text) {
+  let currentValue = editorView.state.doc.toString();
+  if (text === currentValue) {
+    return;
+  }
   editorView.dispatch({
     changes: { from: 0, to: editorView.state.doc.length, insert: text },
   });

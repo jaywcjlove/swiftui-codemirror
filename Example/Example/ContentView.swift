@@ -9,28 +9,9 @@ import SwiftUI
 import CodeMirror
 
 let jsonString = """
-    {
-      "private": true,
-      "scripts": {
-        "start": "rollup -c"
-      },
-      "dependencies": {
-        "@codemirror/lang-css": "^6.0.0",
-        "@codemirror/lang-html": "^6.0.0",
-        "@codemirror/lang-javascript": "^6.0.0",
-        "@codemirror/lang-json": "^6.0.0",
-        "@codemirror/lang-xml": "^6.0.0",
-        
-        "@codemirror/language-data": "^6.0.0",
-        "@codemirror/theme-one-dark": "^6.0.0",
-        
-        "@rollup/plugin-node-resolve": "^15.0.2",
-        "@rollup/plugin-terser": "^0.4.0",
-        "codemirror": "^6.0.0",
-        "rollup": "^4.0.0",
-        "rollup-plugin-sizes": "~1.1.0"
-      }
-    }
+    <body>
+        <h1>DevHub</h1>
+    </body>
     """
 
 struct ContentView: View {
@@ -39,7 +20,7 @@ struct ContentView: View {
     @State var lineNumber = true
     @State var foldGutter = false
     @State var readOnly = false
-    @State var language: Language = .json
+    @State var language: Language = .html
     @State var theme: Themes = .vscodedark
     @State var enabledSearch = false
     @State var count: Int = 0
