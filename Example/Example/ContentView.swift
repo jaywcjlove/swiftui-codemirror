@@ -50,7 +50,7 @@ struct ContentView: View {
     }
     var body: some View {
         VStack(spacing: 0) {
-            TextField("Placeholder", text: $textForTextField)
+//            TextField("Placeholder", text: $textForTextField)
 //            ScrollView {
 //                Text(value)
 //            }

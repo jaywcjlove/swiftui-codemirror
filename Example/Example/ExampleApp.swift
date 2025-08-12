@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CodeMirror
 
 @main
 struct ExampleApp: App {
@@ -13,5 +14,14 @@ struct ExampleApp: App {
         WindowGroup {
             ContentView()
         }
+    }
+}
+
+struct ContentView2: View {
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value, prompt: String(localized: "Please enter text"))
+            .cmLanguage(.constant(.html))
+            .cmLineWrapping(.constant(true))
     }
 }

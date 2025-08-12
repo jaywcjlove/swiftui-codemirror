@@ -16,14 +16,14 @@ import WebKit
 public struct CodeMirrorView: NativeView {
     @ObservedObject public var vm: CodeMirrorVM
     @Binding var value: String
-    @State var previewValue: String = ""
+    var prevValue: String = ""
     public init(
         _ viewModel: CodeMirrorVM,
         value: Binding<String>
     ) {
         self.vm = viewModel
         self._value = value
-        self.previewValue = value.wrappedValue
+        self.prevValue = value.wrappedValue
     }
 #if canImport(AppKit)
     public func makeNSView(context: Context) -> WKWebView {
@@ -125,7 +125,7 @@ public struct CodeMirrorView: NativeView {
                 args: [:]
             )
         )
-        if previewValue != value {
+        if prevValue != value {
             context.coordinator.queueJavascriptFunction(
                 JavascriptFunction(
                     functionString: "CodeMirror.setContent(value)",
@@ -220,10 +220,9 @@ extension Coordinator: WKScriptMessageHandler {
             callPendingFunctions()
         case ScriptMessageName.codeMirrorContentDidChange:
             parent.vm.onContentChange?()
-            Task {
-                guard let content = try await parent.vm.getContent() else { return }
-                parent.value = content
-                parent.previewValue = content
+            if let messageBody = message.body as? String {
+                parent.value = messageBody
+                parent.prevValue = messageBody
             }
         default:
             print("CodeMirrorWebView receive \(message.name) \(message.body)")

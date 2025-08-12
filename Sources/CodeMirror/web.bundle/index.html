@@ -17,9 +17,8 @@
       if (window.webkit) {
         window.webkit.messageHandlers.codeMirrorDidReady.postMessage(null);
         CodeMirror.setListener(() => {
-          window.webkit.messageHandlers.codeMirrorContentDidChange.postMessage(
-            null
-          );
+            let code = CodeMirror.getContent();
+            window.webkit.messageHandlers.codeMirrorContentDidChange.postMessage(code);
         });
       }
     </script>
