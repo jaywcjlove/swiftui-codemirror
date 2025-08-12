@@ -114,6 +114,19 @@ struct ContentView: View {
 }
 ```
 
+**Show Fold Gutter**
+
+```swift
+struct ContentView: View {
+    @State var foldGutter = false
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .cmFoldGutter($foldGutter)
+    }
+}
+```
+
 **Set Editor Read-Only**
 
 ```swift

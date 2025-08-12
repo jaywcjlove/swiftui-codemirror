@@ -37,6 +37,7 @@ struct ContentView: View {
     @State var value: String = jsonString
     @State var lineWrapping = false
     @State var lineNumber = true
+    @State var foldGutter = false
     @State var readOnly = false
     @State var language: Language = .json
     @State var theme: Themes = .vscodedark
@@ -50,6 +51,7 @@ struct ContentView: View {
             CodeMirror(value: $value)
                 .cmLineNumber($lineNumber)
                 .cmLineWrapping($lineWrapping)
+                .cmFoldGutter($foldGutter)
                 .cmReadOnly($readOnly)
                 .cmLanguage($language)
                 .cmTheme($theme)
@@ -65,18 +67,28 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     HStack {
-                        Toggle(isOn: $lineNumber, label: { Text("Line Number") })
-                            .toggleStyle(.checkbox)
-                        Toggle(isOn: $lineWrapping, label: { Text("Line Wrapping") })
-                            .toggleStyle(.checkbox)
+                        Menu {
+                            Toggle(isOn: $lineNumber, label: { Text("Line Number") })
+                                .toggleStyle(.checkbox)
+                            Toggle(isOn: $lineWrapping, label: { Text("Line Wrapping") })
+                                .toggleStyle(.checkbox)
+                            Toggle(isOn: $foldGutter, label: { Text("Fold Gutter") })
+                                .toggleStyle(.checkbox)
+                            Toggle(isOn: $readOnly, label: { Text("Read Only") })
+                                .toggleStyle(.checkbox)
+                        } label: {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(.secondary)
+                        }
+                        .menuIndicator(.hidden)
+                        .buttonStyle(.plain)
                         Button {
                             count += 1
                             value = "Hello World! \(count)"
                         } label: {
                             Text("SET")
                         }
-                        Toggle(isOn: $readOnly, label: { Text("Read Only") })
-                            .toggleStyle(.checkbox)
                         Spacer()
                         Picker("Lang", selection: $language) {
                             ForEach(Language.allCases, id: \.rawValue) {

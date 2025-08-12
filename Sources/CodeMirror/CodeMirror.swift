@@ -36,6 +36,11 @@ public struct CodeMirror: View {
         vm.language = value.wrappedValue
         return self as CodeMirror
     }
+    /// Set Programming Language
+    public func cmFoldGutter(_ value: Binding<Bool>) -> CodeMirror {
+        vm.foldGutter = value.wrappedValue
+        return self as CodeMirror
+    }
     /// Set Theme
     public func cmTheme(_ value: Binding<Themes>) -> CodeMirror {
         vm.theme = value.wrappedValue

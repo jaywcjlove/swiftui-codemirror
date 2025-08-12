@@ -85,8 +85,14 @@ public struct CodeMirrorView: NativeView {
         )
         context.coordinator.queueJavascriptFunction(
             JavascriptFunction(
-                functionString: "CodeMirror.setlineNumber(value)",
+                functionString: "CodeMirror.setLineNumber(value)",
                 args: ["value": vm.lineNumber]
+            )
+        )
+        context.coordinator.queueJavascriptFunction(
+            JavascriptFunction(
+                functionString: "CodeMirror.setFoldGutter(value)",
+                args: ["value": vm.foldGutter]
             )
         )
         context.coordinator.queueJavascriptFunction(

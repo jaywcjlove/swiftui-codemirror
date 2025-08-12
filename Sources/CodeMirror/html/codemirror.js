@@ -97,6 +97,8 @@ const listener = new Compartment();
 const readOnly = new Compartment();
 const lineWrapping = new Compartment();
 const lineNumber = new Compartment();
+const foldGutterComp = new Compartment();
+
 const SUPPORTED_LANGUAGES_MAP = {
   javascript,
   jsx: () => javascript({ jsx: true }),
@@ -187,7 +189,6 @@ const editorView = new CodeMirror.EditorView({
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     history(),
-    foldGutter(),
     drawSelection(),
     dropCursor(),
     indentOnInput(),
@@ -208,6 +209,7 @@ const editorView = new CodeMirror.EditorView({
       ...completionKeymap,
       indentWithTab,
     ]),
+    foldGutterComp.of([]),
     readOnly.of([]),
     lineWrapping.of([]),
     lineNumber.of([]),
@@ -275,9 +277,15 @@ function setLineWrapping(enabled) {
   });
 }
 
-function setlineNumber(enabled) {
+function setLineNumber(enabled) {
   editorView.dispatch({
     effects: lineNumber.reconfigure(enabled ? lineNumbers() : []),
+  });
+}
+
+function setFoldGutter(enabled) {
+  editorView.dispatch({
+    effects: foldGutterComp.reconfigure(enabled ? foldGutter() : []),
   });
 }
 
@@ -290,6 +298,7 @@ export {
   setReadOnly,
   setTheme,
   setLineWrapping,
-  setlineNumber,
+  setLineNumber,
+  setFoldGutter,
   editorView,
 };
