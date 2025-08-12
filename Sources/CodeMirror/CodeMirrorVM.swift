@@ -91,6 +91,8 @@ public class CodeMirrorVM: ObservableObject {
     @Published public var language: Language = .json
     @Published public var theme: Themes = .vscodelight
     
+    @Published public var focused = false
+    
     public var onLoadSuccess: (() -> Void)?
     public var onLoadFailed: ((Error) -> Void)?
     public var onContentChange: (() -> Void)?

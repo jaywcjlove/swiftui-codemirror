@@ -296,6 +296,14 @@ function setFoldGutter(enabled) {
   });
 }
 
+function setFocus() {
+  editorView.focus();
+}
+
+function setBlur() {
+  editorView.dom.blur()
+}
+
 export {
   setLanguage,
   getSupportedLanguages,
@@ -308,5 +316,7 @@ export {
   setLineNumber,
   setFoldGutter,
   setEnabledSearch,
+  setFocus,
+  setBlur,
   editorView,
 };

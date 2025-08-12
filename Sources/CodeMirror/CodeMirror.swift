@@ -10,11 +10,18 @@ import SwiftUI
 public struct CodeMirror: View {
     @ObservedObject var vm: CodeMirrorVM = .init()
     @Binding var value: String
+    @FocusState private var isFocused: Bool
     public init(value: Binding<String>) {
         self._value = value
     }
     public var body: some View {
         CodeMirrorView(vm, value: $value)
+            .focused($isFocused)
+            .onChange(of: isFocused, initial: true) { old, val in
+                if old != val {
+                    vm.focused = val
+                }
+            }
     }
     /// Set Line Wrapping
     public func cmLineWrapping(_ value: Binding<Bool>) -> CodeMirror {

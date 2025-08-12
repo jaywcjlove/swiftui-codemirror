@@ -43,8 +43,13 @@ struct ContentView: View {
     @State var theme: Themes = .vscodedark
     @State var enabledSearch = false
     @State var count: Int = 0
+    @FocusState var input: InputFocused?
+    @State private var textForTextField: String = ""
+    enum InputFocused: Hashable {
+        case text, output, test
+    }
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
 //            ScrollView {
 //                Text(value)
 //            }
@@ -66,6 +71,7 @@ struct ContentView: View {
                 .onContentChange {
                     print("@@@3 Content Did Change")
                 }
+                .focused($input, equals: .text)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     HStack {
@@ -93,6 +99,26 @@ struct ContentView: View {
                         } label: {
                             Text("SET")
                         }
+                        Button {
+                            self.input = .output
+                        } label: {
+                            Text("Focused1")
+                        }
+                        Button {
+                            self.input = .text
+                        } label: {
+                            Text("Focused text")
+                        }
+                        Button {
+                            self.input = .test
+                        } label: {
+                            Text("Focused3")
+                        }
+                        Button {
+                            self.input = nil
+                        } label: {
+                            Text("Focused4")
+                        }
                         Spacer()
                         Picker("Lang", selection: $language) {
                             ForEach(Language.allCases, id: \.rawValue) {
@@ -112,6 +138,9 @@ struct ContentView: View {
                     .padding(.horizontal, 6)
                     .padding(.vertical, 6)
                 }
+        }
+        .onAppear() {
+            input = .text
         }
     }
 }

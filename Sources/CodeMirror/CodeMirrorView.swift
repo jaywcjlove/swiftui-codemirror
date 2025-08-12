@@ -113,6 +113,12 @@ public struct CodeMirrorView: NativeView {
                 args: ["value": vm.language.rawValue]
             )
         )
+        context.coordinator.queueJavascriptFunction(
+            JavascriptFunction(
+                functionString: vm.focused == true ? "CodeMirror.setFocus()" : "CodeMirror.setBlur()",
+                args: [:]
+            )
+        )
         if previewValue != value {
             context.coordinator.queueJavascriptFunction(
                 JavascriptFunction(
