@@ -140,6 +140,19 @@ struct ContentView: View {
 }
 ```
 
+**Set enabled search**
+
+```swift
+struct ContentView: View {
+    @State var enabledSearch = false
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .cmEnabledSearch($enabledSearch)
+    }
+}
+```
+
 **Set Programming Language**
 
 ```swift

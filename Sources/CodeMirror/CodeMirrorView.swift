@@ -103,6 +103,12 @@ public struct CodeMirrorView: NativeView {
         )
         context.coordinator.queueJavascriptFunction(
             JavascriptFunction(
+                functionString: "CodeMirror.setEnabledSearch(value)",
+                args: ["value": vm.enabledSearch]
+            )
+        )
+        context.coordinator.queueJavascriptFunction(
+            JavascriptFunction(
                 functionString: "CodeMirror.setLanguage(value)",
                 args: ["value": vm.language.rawValue]
             )

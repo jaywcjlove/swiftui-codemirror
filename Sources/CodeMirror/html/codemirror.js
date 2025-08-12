@@ -91,14 +91,6 @@ import {
   completionKeymap,
 } from "@codemirror/autocomplete";
 
-const theme = new Compartment();
-const language = new Compartment();
-const listener = new Compartment();
-const readOnly = new Compartment();
-const lineWrapping = new Compartment();
-const lineNumber = new Compartment();
-const foldGutterComp = new Compartment();
-
 const SUPPORTED_LANGUAGES_MAP = {
   javascript,
   jsx: () => javascript({ jsx: true }),
@@ -183,6 +175,15 @@ const baseTheme = EditorView.baseTheme({
   },
 });
 
+const theme = new Compartment();
+const language = new Compartment();
+const listener = new Compartment();
+const readOnly = new Compartment();
+const lineWrapping = new Compartment();
+const lineNumber = new Compartment();
+const foldGutterComp = new Compartment();
+const searchKeymapComp = new Compartment();
+
 const editorView = new CodeMirror.EditorView({
   doc: "",
   extensions: [
@@ -203,12 +204,12 @@ const editorView = new CodeMirror.EditorView({
     keymap.of([
       ...closeBracketsKeymap,
       ...defaultKeymap,
-      ...searchKeymap,
       ...historyKeymap,
       ...foldKeymap,
       ...completionKeymap,
       indentWithTab,
     ]),
+    searchKeymapComp.of([]),
     foldGutterComp.of([]),
     readOnly.of([]),
     lineWrapping.of([]),
@@ -283,6 +284,12 @@ function setLineNumber(enabled) {
   });
 }
 
+function setEnabledSearch(enabled) {
+  editorView.dispatch({
+    effects: searchKeymapComp.reconfigure(enabled ? keymap.of([ ...searchKeymap ]) : []),
+  });
+}
+
 function setFoldGutter(enabled) {
   editorView.dispatch({
     effects: foldGutterComp.reconfigure(enabled ? foldGutter() : []),
@@ -300,5 +307,6 @@ export {
   setLineWrapping,
   setLineNumber,
   setFoldGutter,
+  setEnabledSearch,
   editorView,
 };

@@ -81,13 +81,13 @@ public enum Themes: String, CaseIterable, Hashable {
     case xcodedark
 }
 
-
 @MainActor
 public class CodeMirrorVM: ObservableObject {
     @Published public var lineWrapping = false
     @Published public var lineNumber = true
     @Published public var foldGutter = false
     @Published public var readOnly = false
+    @Published public var enabledSearch = false
     @Published public var language: Language = .json
     @Published public var theme: Themes = .vscodelight
     
@@ -101,6 +101,8 @@ public class CodeMirrorVM: ObservableObject {
         lineWrapping: Bool = false,
         lineNumber: Bool = false,
         foldGutter: Bool = false,
+        readOnly: Bool = false,
+        enabledSearch: Bool = false,
         language: Language = .json,
         theme: Themes = .vscodedark
     ) {
@@ -108,6 +110,7 @@ public class CodeMirrorVM: ObservableObject {
         self.lineNumber = lineNumber
         self.foldGutter = foldGutter
         self.readOnly = readOnly
+        self.enabledSearch = enabledSearch
         self.language = language
         self.theme = theme
     }

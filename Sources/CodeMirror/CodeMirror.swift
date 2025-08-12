@@ -31,6 +31,11 @@ public struct CodeMirror: View {
         vm.readOnly = value.wrappedValue
         return self as CodeMirror
     }
+    /// Set Enabled Search
+    public func cmEnabledSearch(_ value: Binding<Bool>) -> CodeMirror {
+        vm.enabledSearch = value.wrappedValue
+        return self as CodeMirror
+    }
     /// Set Programming Language
     public func cmLanguage(_ value: Binding<Language>) -> CodeMirror {
         vm.language = value.wrappedValue
