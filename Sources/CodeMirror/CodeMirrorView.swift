@@ -23,7 +23,6 @@ public struct CodeMirrorView: NativeView {
     ) {
         self.vm = viewModel
         self._value = value
-        self.prevValue = value.wrappedValue
     }
 #if canImport(AppKit)
     public func makeNSView(context: Context) -> WKWebView {
