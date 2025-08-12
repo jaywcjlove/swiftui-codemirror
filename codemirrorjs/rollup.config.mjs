@@ -4,7 +4,7 @@ import sizes from 'rollup-plugin-sizes';
 export default {
     input: "./codemirror.js",
     output: {
-        file: "./web.bundle/codemirror.bundle.js",
+        file: "../Sources/CodeMirror/web.bundle/codemirror.bundle.js",
         format: "umd",
         extend: true,
         name: "CodeMirror",

@@ -19,15 +19,15 @@ let package = Package(
     targets: [
         .target(
             name: "CodeMirror",
-            exclude: [
-                "html/codemirror.js",
-                "html/node_modules",
-                "html/package-lock.json",
-                "html/package.json",
-                "html/rollup.config.mjs",
-            ],
+            // exclude: [
+            //     "html/codemirror.js",
+            //     "html/node_modules",
+            //     "html/package-lock.json",
+            //     "html/package.json",
+            //     "html/rollup.config.mjs",
+            // ],
             resources: [
-                .copy("html/web.bundle")
+                .copy("web.bundle")
             ]
         )
     ]
