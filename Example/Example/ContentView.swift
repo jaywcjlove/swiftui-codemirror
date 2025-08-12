@@ -34,59 +34,67 @@ let jsonString = """
     """
 
 struct ContentView: View {
-    @ObservedObject var vm: CodeMirrorVM = .init()
+    @State var value: String = jsonString
+    @State var lineWrapping = false
+    @State var lineNumber = true
+    @State var readOnly = false
+    @State var language: Language = .json
+    @State var theme: Themes = .vscodedark
+    @State var count: Int = 0
     var body: some View {
         VStack {
-            CodeMirror(vm)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .navigationTitle("Example")
-                .onAppear {
-                    vm.setContent(jsonString)
+//            ScrollView {
+//                Text(value)
+//            }
+//            .frame(height: 120)
+            CodeMirror(value: $value)
+                .cmLineNumber($lineNumber)
+                .cmLineWrapping($lineWrapping)
+                .cmReadOnly($readOnly)
+                .cmLanguage($language)
+                .cmTheme($theme)
+                .onLoadSuccess() {
+                    print("Hello!")
                 }
-                .toolbar {
-                    ToolbarItem {
-                        Toggle(isOn: $vm.lineNumber, label: { Text("Line Number") })
+                .onLoadFailed { error in
+                    print("@@@2 \(#function) \(error)")
+                }
+                .onContentChange {
+                    print("@@@3 Content Did Change")
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    HStack {
+                        Toggle(isOn: $lineNumber, label: { Text("Line Number") })
                             .toggleStyle(.checkbox)
-                    }
-                    ToolbarItem {
-                        Toggle(isOn: $vm.lineWrapping, label: { Text("Line Wrapping") })
+                        Toggle(isOn: $lineWrapping, label: { Text("Line Wrapping") })
                             .toggleStyle(.checkbox)
-                    }
-                    ToolbarItem {
                         Button {
-                            Task {
-                                let content = try? await vm.getContent()
-                                print(content ?? "")
-                            }
-                        } label: {
-                            Text("GET")
-                        }
-                    }
-                    ToolbarItem {
-                        Button {
-                            vm.setContent("Hello World!")
+                            count += 1
+                            value = "Hello World! \(count)"
                         } label: {
                             Text("SET")
                         }
-                    }
-                    ToolbarItem {
-                        Toggle(isOn: $vm.readOnly, label: { Text("Read Only") })
+                        Toggle(isOn: $readOnly, label: { Text("Read Only") })
                             .toggleStyle(.checkbox)
-                    }
-                    ToolbarItem {
-                        Picker("Lang", selection: $vm.language) {
+                        Spacer()
+                        Picker("Lang", selection: $language) {
                             ForEach(Language.allCases, id: \.rawValue) {
-                                Text($0.rawValue).tag($0)
+                                Text("Lang: \($0.rawValue)").tag($0)
                             }
                         }
-                    }
-                    ToolbarItem {
-                        Picker("Theme", selection: $vm.theme) {
+                        .labelsHidden()
+                        .frame(width: 134)
+                        Picker("Theme", selection: $theme) {
                             ForEach(Themes.allCases, id: \.rawValue) {
-                                Text($0.rawValue).tag($0)
+                                Text("Theme: \($0.rawValue)").tag($0)
                             }
                         }
+                        .labelsHidden()
+                        .frame(width: 140)
                     }
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 6)
                 }
         }
     }

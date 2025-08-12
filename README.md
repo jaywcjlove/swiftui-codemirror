@@ -65,7 +65,106 @@ dependencies: [
 
 ## Usage
 
-### Basic Usage
+### CodeMirror
+
+```swift
+import SwiftUI
+import CodeMirror
+
+struct ContentView: View {
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .onLoadSuccess() {
+                print("Hello!")
+            }
+            .onLoadFailed { error in
+                print("@@@2 \(#function) \(error)")
+            }
+            .onContentChange {
+                print("@@@3 Content Did Change")
+            }
+    }
+}
+```
+
+**Set Theme**
+
+```swift
+struct ContentView: View {
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+    }
+}
+```
+
+**Set Line Wrapping**
+
+```swift
+struct ContentView: View {
+    @State var lineWrapping = false
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .cmLineWrapping($lineWrapping)
+    }
+}
+```
+
+**Show Line Numbers**
+
+```swift
+struct ContentView: View {
+    @State var lineNumber = true
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .cmLineNumber($lineNumber)
+    }
+}
+```
+
+**Set Editor Read-Only**
+
+```swift
+struct ContentView: View {
+    @State var readOnly = false
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .cmReadOnly($readOnly)
+    }
+}
+```
+
+**Set Programming Language**
+
+```swift
+struct ContentView: View {
+    @State var language: Language = .json
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .cmLanguage($language)
+    }
+}
+```
+
+**Set Theme**
+
+```swift
+struct ContentView: View {
+    @State var theme: Themes = .vscodelight
+    @State var value: String = ""
+    var body: some View {
+        CodeMirror(value: $value)
+            .cmTheme($theme)
+    }
+}
+```
+
+### CodeMirrorView
 
 ```swift
 import SwiftUI
@@ -73,8 +172,9 @@ import CodeMirror
 
 struct ContentView: View {
     @ObservedObject var vm: CodeMirrorVM = .init()
+    @State var value: String = ""
     var body: some View {
-        CodeMirror(vm)
+        CodeMirrorView(vm, value: $value)
             .onAppear {
                 vm.setContent(jsonString)
             }
@@ -82,7 +182,7 @@ struct ContentView: View {
 }
 ```
 
-### Set Theme
+**Set Theme**
 
 ```swift
 import SwiftUI
@@ -90,9 +190,10 @@ import CodeMirror
 
 struct ContentView: View {
     @ObservedObject var vm: CodeMirrorVM = .init()
+    @State var value: String = ""
     var body: some View {
         VStack {
-            CodeMirror(vm)
+            CodeMirrorView(vm, value: $value)
                 .onAppear {
                     vm.setContent(jsonString)
                 }
@@ -106,7 +207,7 @@ struct ContentView: View {
 }
 ```
 
-### Set Programming Language
+**Set Programming Language**
 
 ```swift
 Picker("Lang", selection: $vm.language) {
@@ -120,7 +221,7 @@ Picker("Lang", selection: $vm.language) {
 vm.language = .json
 ```
 
-### Set Editor Content
+**Set Editor Content**
 
 ```swift
 Button {
@@ -130,7 +231,7 @@ Button {
 }
 ```
 
-### Get Editor Text Content
+**Get Editor Text Content**
 
 ```swift
 Button {
@@ -143,14 +244,14 @@ Button {
 }
 ```
 
-### Set Editor Read-Only
+**Set Editor Read-Only**
 
 ```swift
 Toggle(isOn: $vm.readOnly, label: { Text("Read Only") })
     .toggleStyle(.checkbox)
 ```
 
-### Show Line Numbers
+**Show Line Numbers**
 
 ```swift
 ToolbarItem {
@@ -159,13 +260,29 @@ ToolbarItem {
 }
 ```
 
-### Set Line Wrapping
+**Set Line Wrapping**
 
 ```swift
 ToolbarItem {
     Toggle(isOn: $vm.lineWrapping, label: { Text("Line Wrapping") })
         .toggleStyle(.checkbox)
 }
+```
+
+**Event**
+
+```swift
+@ObservedObject var vm: CodeMirrorVM = .init(
+    onLoadSuccess: {
+        print("@@@1 \(#function)")
+    },
+    onLoadFailed: { error in
+        print("@@@2 \(#function) \(error)")
+    },
+    onContentChange: {
+        print("@@@3 Content Did Change")
+    }
+)
 ```
 
 ## Acknowledgments

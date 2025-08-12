@@ -100,19 +100,13 @@ public class CodeMirrorVM: ObservableObject {
         lineWrapping: Bool = false,
         lineNumber: Bool = false,
         language: Language = .json,
-        theme: Themes = .vscodedark,
-        onLoadSuccess: (() -> Void)? = nil,
-        onLoadFailed: ((Error) -> Void)? = nil,
-        onContentChange: (() -> Void)? = nil
+        theme: Themes = .vscodedark
     ) {
         self.lineWrapping = lineWrapping
         self.lineNumber = lineNumber
         self.readOnly = readOnly
         self.language = language
         self.theme = theme
-        self.onLoadSuccess = onLoadSuccess
-        self.onLoadFailed = onLoadFailed
-        self.onContentChange = onContentChange
     }
     
     private func executeJSAsync<T>(f: JavascriptFunction) async throws -> T? where T: Sendable {

@@ -1,271 +1,86 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+//
+//  CodeMirror.swift
+//  CodeMirror
+//
+//  Created by wong on 8/12/25.
+//
 
 import SwiftUI
-import WebKit
 
-#if canImport(AppKit)
-    import AppKit
-    public typealias NativeView = NSViewRepresentable
-#elseif canImport(UIKit)
-    import UIKit
-    public typealias NativeView = UIViewRepresentable
-#endif
-
-@MainActor
-public struct CodeMirror: NativeView {
-    @ObservedObject public var vm: CodeMirrorVM
-    public init(_ viewModel: CodeMirrorVM) {
-        self.vm = viewModel
+public struct CodeMirror: View {
+    @ObservedObject var vm: CodeMirrorVM = .init()
+    @Binding var value: String
+    public init(value: Binding<String>) {
+        self._value = value
     }
-#if canImport(AppKit)
-    public func makeNSView(context: Context) -> WKWebView {
-        createWebView(context: context)
+    public var body: some View {
+        CodeMirrorView(vm, value: $value)
     }
-    public func updateNSView(_ nsView: WKWebView, context: Context) {
-        updateWebView(context: context)
+    /// Set Line Wrapping
+    public func cmLineWrapping(_ value: Binding<Bool>) -> CodeMirror {
+        vm.lineWrapping = value.wrappedValue
+        return self as CodeMirror
     }
-#elseif canImport(UIKit)
-    public func makeUIView(context: Context) -> WKWebView {
-        createWebView(context: context)
+    /// Show Line Numbers
+    public func cmLineNumber(_ value: Binding<Bool>) -> CodeMirror {
+        vm.lineNumber = value.wrappedValue
+        return self as CodeMirror
     }
-    public func updateUIView(_ nsView: WKWebView, context: Context) {
-        updateWebView(context: context)
+    /// Set Editor Read-Only
+    public func cmReadOnly(_ value: Binding<Bool>) -> CodeMirror {
+        vm.readOnly = value.wrappedValue
+        return self as CodeMirror
     }
-#endif
-    private func createWebView(context: Context) -> WKWebView {
-        let preferences = WKPreferences()
-        let userController = WKUserContentController()
-        userController.add(context.coordinator, name: ScriptMessageName.codeMirrorDidReady)
-        userController.add(context.coordinator, name: ScriptMessageName.codeMirrorContentDidChange)
-
-        let configuration = WKWebViewConfiguration()
-        configuration.preferences = preferences
-        configuration.userContentController = userController
-
-        let webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.navigationDelegate = context.coordinator
-        #if os(OSX)
-            webView.setValue(false, forKey: "drawsBackground")  // prevent white flicks
-            webView.allowsMagnification = false
-        #elseif os(iOS)
-            webView.isOpaque = false
-        #endif
-        let indexURL = Bundle.module.url(
-            forResource: "index",
-            withExtension: "html",
-            subdirectory: "web.bundle"
-        )
-        let baseURL = Bundle.module.url(forResource: "web.bundle", withExtension: nil)
-        let data = try! Data.init(contentsOf: indexURL!)
-        webView.load(data, mimeType: "text/html", characterEncodingName: "utf-8", baseURL: baseURL!)
-        context.coordinator.webView = webView
-        return webView
+    /// Set Programming Language
+    public func cmLanguage(_ value: Binding<Language>) -> CodeMirror {
+        vm.language = value.wrappedValue
+        return self as CodeMirror
     }
-    
-    private func updateWebView(context: Context) {
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setTheme(value)",
-                args: ["value": vm.theme.rawValue]
-            )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setLineWrapping(value)",
-                args: ["value": vm.lineWrapping]
-            )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setlineNumber(value)",
-                args: ["value": vm.lineNumber]
-            )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setReadOnly(value)",
-                args: ["value": vm.readOnly]
-            )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setLanguage(value)",
-                args: ["value": vm.language.rawValue]
-            )
-        )
+    /// Set Theme
+    public func cmTheme(_ value: Binding<Themes>) -> CodeMirror {
+        vm.theme = value.wrappedValue
+        return self as CodeMirror
     }
-    public func makeCoordinator() -> Coordinator {
-        let coordinator = Coordinator(parent: self, viewModel: vm)
-        vm.executeJS = { fn, cb in
-            coordinator.queueJavascriptFunction(fn, callback: cb)
-        }
-        return coordinator
+    public func onLoadSuccess(perform action: (() -> Void)? = nil) -> CodeMirror {
+        vm.onLoadSuccess = action
+        return self as CodeMirror
     }
-}
-
-
-@MainActor
-public class Coordinator: NSObject {
-    var parent: CodeMirror
-    var viewModel: CodeMirrorVM
-    var webView: WKWebView!
-    private var pageLoaded = false
-    private var pendingFunctions = [(JavascriptFunction, JavascriptCallback?)]()
-
-    init(parent: CodeMirror, viewModel: CodeMirrorVM) {
-        self.parent = parent
-        self.viewModel = viewModel
+    public func onLoadFailed(perform action: ((Error) -> Void)? = nil) -> CodeMirror {
+        vm.onLoadFailed = action
+        return self as CodeMirror
     }
-    
-    internal func queueJavascriptFunction(
-        _ function: JavascriptFunction,
-        callback: JavascriptCallback? = nil
-    ) {
-        if pageLoaded {
-            evaluateJavascript(function: function, callback: callback)
-        }
-        else {
-            pendingFunctions.append((function, callback))
-        }
-    }
-    
-    private func callPendingFunctions() {
-        for (function, callback) in pendingFunctions {
-            evaluateJavascript(function: function, callback: callback)
-        }
-        pendingFunctions.removeAll()
-    }
-
-    private func evaluateJavascript(
-        function: JavascriptFunction,
-        callback: JavascriptCallback? = nil
-    ) {
-        // not sure why but callAsyncJavaScript always callback with result of nil
-        if let callback = callback {
-            webView.evaluateJavaScript(function.functionString) { (response, error) in
-                if let error = error {
-                    callback(.failure(error))
-                }
-                else {
-                    callback(.success(response))
-                }
-            }
-        }
-        else {
-            webView.callAsyncJavaScript(
-                function.functionString,
-                arguments: function.args,
-                in: nil,
-                in: .page
-            ) { (result) in
-                switch result {
-                case .failure(let error):
-                    callback?(.failure(error))
-                case .success(let data):
-                    callback?(.success(data))
-                }
-            }
-        }
-    }
-}
-
-extension Coordinator: WKScriptMessageHandler {
-    public func userContentController(
-        _ userContentController: WKUserContentController,
-        didReceive message: WKScriptMessage
-    ) {
-        switch message.name {
-        case ScriptMessageName.codeMirrorDidReady:
-            pageLoaded = true
-            callPendingFunctions()
-        case ScriptMessageName.codeMirrorContentDidChange:
-            parent.vm.onContentChange?()
-        default:
-            print("CodeMirrorWebView receive \(message.name) \(message.body)")
-        }
-    }
-}
-
-extension Coordinator: WKNavigationDelegate {
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        parent.vm.onLoadSuccess?()
-    }
-
-    public func webView(
-        _ webView: WKWebView,
-        didFail navigation: WKNavigation!,
-        withError error: Error
-    ) {
-        parent.vm.onLoadFailed?(error)
-    }
-
-    public func webView(
-        _ webView: WKWebView,
-        didFailProvisionalNavigation navigation: WKNavigation!,
-        withError error: Error
-    ) {
-        parent.vm.onLoadFailed?(error)
+    public func onContentChange(perform action: (() -> Void)? = nil) -> CodeMirror {
+        vm.onContentChange = action
+        return self as CodeMirror
     }
 }
 
 #if DEBUG
 #Preview {
-    let jsonString = """
-        {
-          "private": true,
-          "scripts": {
-            "start": "rollup -c"
-          },
-          "dependencies": {
-            "@codemirror/lang-css": "^6.0.0",
-            "@codemirror/lang-html": "^6.0.0",
-            "@codemirror/lang-javascript": "^6.0.0",
-            "@codemirror/lang-json": "^6.0.0",
-            "@codemirror/lang-xml": "^6.0.0",
-            
-            "@codemirror/language-data": "^6.0.0",
-            "@codemirror/theme-one-dark": "^6.0.0",
-            
-            "@rollup/plugin-node-resolve": "^15.0.2",
-            "@rollup/plugin-terser": "^0.4.0",
-            "codemirror": "^6.0.0",
-            "rollup": "^4.0.0",
-            "rollup-plugin-sizes": "~1.1.0"
-          }
-        }
-        """
-    @ObservedObject var vm: CodeMirrorVM = .init(
-        onLoadSuccess: {
-            print("@@@1 \(#function)")
-        },
-        onLoadFailed: { error in
-            print("@@@2 \(#function) \(error)")
-        },
-        onContentChange: {
-            print("@@@3 Content Did Change")
-        }
-    )
-    VStack {
-        CodeMirror(vm)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("Example")
-            .onAppear {
-                vm.setContent(jsonString)
-            }
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        Task {
-                            let content = try? await vm.getContent()
-                            print(content ?? "")
-                        }
-                    } label: {
-                        Text("GET")
-                    }
-                }
-                
-            }
+    @Previewable @State var code: String = """
+    {
+      "private": true,
+      "scripts": {
+        "start": "rollup -c"
+      },
+      "dependencies": {
+        "@codemirror/lang-css": "^6.0.0",
+        "@codemirror/lang-html": "^6.0.0",
+        "@codemirror/lang-javascript": "^6.0.0",
+        "@codemirror/lang-json": "^6.0.0",
+        "@codemirror/lang-xml": "^6.0.0",
+        
+        "@codemirror/language-data": "^6.0.0",
+        "@codemirror/theme-one-dark": "^6.0.0",
+        
+        "@rollup/plugin-node-resolve": "^15.0.2",
+        "@rollup/plugin-terser": "^0.4.0",
+        "codemirror": "^6.0.0",
+        "rollup": "^4.0.0",
+        "rollup-plugin-sizes": "~1.1.0"
+      }
     }
+    """
+    CodeMirror(value: $code)
 }
 #endif

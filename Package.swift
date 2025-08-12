@@ -7,7 +7,7 @@ let package = Package(
     name: "CodeMirror",
     platforms: [
         .iOS(.v14),
-        .macOS(.v11),
+        .macOS(.v14),
     ],
     products: [
         .library(
