@@ -82,7 +82,7 @@ struct ContentView: View {
             .onLoadFailed { error in
                 print("@@@2 \(#function) \(error)")
             }
-            .onContentChange {
+            .onContentChange { value in
                 print("@@@3 Content Did Change")
             }
     }
@@ -299,7 +299,7 @@ ToolbarItem {
     onLoadFailed: { error in
         print("@@@2 \(#function) \(error)")
     },
-    onContentChange: {
+    onContentChange: { value in
         print("@@@3 Content Did Change")
     }
 )

@@ -50,8 +50,8 @@ struct ContentView: View {
                 .onLoadFailed { error in
                     print("@@@2 \(#function) \(error)")
                 }
-                .onContentChange {
-                    print("@@@3 Content Did Change")
+                .onContentChange { value in
+                    print("@@@3 Content Did Change", value)
                 }
                 .focused($input, equals: .text)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

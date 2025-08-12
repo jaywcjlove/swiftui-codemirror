@@ -96,7 +96,7 @@ public class CodeMirrorVM: ObservableObject {
     
     public var onLoadSuccess: (() -> Void)?
     public var onLoadFailed: ((Error) -> Void)?
-    public var onContentChange: (() -> Void)?
+    public var onContentChange: ((_ value: String) -> Void)?
     
     internal var executeJS: ((JavascriptFunction, JavascriptCallback?) -> Void)!
     

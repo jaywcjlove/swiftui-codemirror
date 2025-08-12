@@ -67,7 +67,7 @@ public struct CodeMirror: View {
         vm.onLoadFailed = action
         return self as CodeMirror
     }
-    public func onContentChange(perform action: (() -> Void)? = nil) -> CodeMirror {
+    public func onContentChange(perform action: ((_ value: String) -> Void)? = nil) -> CodeMirror {
         vm.onContentChange = action
         return self as CodeMirror
     }
