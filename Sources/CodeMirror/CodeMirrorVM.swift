@@ -90,6 +90,7 @@ public class CodeMirrorVM: ObservableObject {
     @Published public var enabledSearch = false
     @Published public var language: Language = .json
     @Published public var theme: Themes = .vscodelight
+    @Published public var placeholder: String = ""
     
     @Published public var focused = false
     
@@ -105,6 +106,7 @@ public class CodeMirrorVM: ObservableObject {
         foldGutter: Bool = false,
         readOnly: Bool = false,
         enabledSearch: Bool = false,
+        placeholder: String = "",
         language: Language = .json,
         theme: Themes = .vscodedark
     ) {
@@ -113,6 +115,7 @@ public class CodeMirrorVM: ObservableObject {
         self.foldGutter = foldGutter
         self.readOnly = readOnly
         self.enabledSearch = enabledSearch
+        self.placeholder = placeholder
         self.language = language
         self.theme = theme
     }

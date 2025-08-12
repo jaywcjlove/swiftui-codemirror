@@ -50,11 +50,12 @@ struct ContentView: View {
     }
     var body: some View {
         VStack(spacing: 0) {
+            TextField("Placeholder", text: $textForTextField)
 //            ScrollView {
 //                Text(value)
 //            }
 //            .frame(height: 120)
-            CodeMirror(value: $value)
+            CodeMirror(value: $value, prompt: String(localized: "Please enter text"))
                 .cmLineNumber($lineNumber)
                 .cmLineWrapping($lineWrapping)
                 .cmFoldGutter($foldGutter)
@@ -100,24 +101,9 @@ struct ContentView: View {
                             Text("SET")
                         }
                         Button {
-                            self.input = .output
-                        } label: {
-                            Text("Focused1")
-                        }
-                        Button {
                             self.input = .text
                         } label: {
                             Text("Focused text")
-                        }
-                        Button {
-                            self.input = .test
-                        } label: {
-                            Text("Focused3")
-                        }
-                        Button {
-                            self.input = nil
-                        } label: {
-                            Text("Focused4")
                         }
                         Spacer()
                         Picker("Lang", selection: $language) {

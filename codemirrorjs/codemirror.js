@@ -1,6 +1,6 @@
 import * as CodeMirror from "codemirror";
 import { Compartment, EditorState } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
+import { EditorView, placeholder } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { StreamLanguage } from '@codemirror/language';
 import { javascript } from "@codemirror/lang-javascript";
@@ -183,6 +183,7 @@ const lineWrapping = new Compartment();
 const lineNumber = new Compartment();
 const foldGutterComp = new Compartment();
 const searchKeymapComp = new Compartment();
+const placeholderComp = new Compartment();
 
 const editorView = new CodeMirror.EditorView({
   doc: "",
@@ -209,6 +210,7 @@ const editorView = new CodeMirror.EditorView({
       ...completionKeymap,
       indentWithTab,
     ]),
+    placeholderComp.of([]),
     searchKeymapComp.of([]),
     foldGutterComp.of([]),
     readOnly.of([]),
@@ -266,6 +268,12 @@ function setListener(fn) {
   });
 }
 
+function setPlaceholder(value) {
+  editorView.dispatch({
+    effects: placeholderComp.reconfigure(value ? [placeholder(value)] : []),
+  });
+}
+
 function setReadOnly(value) {
   editorView.dispatch({
     effects: readOnly.reconfigure(value ? EditorState.readOnly.of(true) : []),
@@ -307,6 +315,7 @@ function setBlur() {
 export {
   setLanguage,
   getSupportedLanguages,
+  setPlaceholder,
   setContent,
   getContent,
   setListener,

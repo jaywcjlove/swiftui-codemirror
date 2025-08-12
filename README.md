@@ -74,6 +74,7 @@ import CodeMirror
 struct ContentView: View {
     @State var value: String = ""
     var body: some View {
+        CodeMirror(value: $value, prompt: String(localized: "Please enter text"))
         CodeMirror(value: $value)
             .onLoadSuccess() {
                 print("Hello!")

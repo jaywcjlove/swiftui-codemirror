@@ -11,8 +11,9 @@ public struct CodeMirror: View {
     @ObservedObject var vm: CodeMirrorVM = .init()
     @Binding var value: String
     @FocusState private var isFocused: Bool
-    public init(value: Binding<String>) {
+    public init(value: Binding<String>, prompt: String = "") {
         self._value = value
+        self.vm.placeholder = prompt
     }
     public var body: some View {
         CodeMirrorView(vm, value: $value)
