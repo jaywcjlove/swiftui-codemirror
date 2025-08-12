@@ -88,17 +88,6 @@ struct ContentView: View {
 }
 ```
 
-**Set Theme**
-
-```swift
-struct ContentView: View {
-    @State var value: String = ""
-    var body: some View {
-        CodeMirror(value: $value)
-    }
-}
-```
-
 **Set Line Wrapping**
 
 ```swift
