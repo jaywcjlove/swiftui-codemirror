@@ -41,6 +41,7 @@ struct ContentView: View {
     @State var readOnly = false
     @State var language: Language = .json
     @State var theme: Themes = .vscodedark
+    @State var enabledSearch = false
     @State var count: Int = 0
     var body: some View {
         VStack {
@@ -54,6 +55,7 @@ struct ContentView: View {
                 .cmFoldGutter($foldGutter)
                 .cmReadOnly($readOnly)
                 .cmLanguage($language)
+                .cmEnabledSearch($enabledSearch)
                 .cmTheme($theme)
                 .onLoadSuccess() {
                     print("Hello!")
@@ -75,6 +77,8 @@ struct ContentView: View {
                             Toggle(isOn: $foldGutter, label: { Text("Fold Gutter") })
                                 .toggleStyle(.checkbox)
                             Toggle(isOn: $readOnly, label: { Text("Read Only") })
+                                .toggleStyle(.checkbox)
+                            Toggle(isOn: $enabledSearch, label: { Text("Enabled Search") })
                                 .toggleStyle(.checkbox)
                         } label: {
                             Image(systemName: "gearshape.fill")

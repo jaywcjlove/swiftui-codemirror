@@ -99,7 +99,7 @@ public class CodeMirrorVM: ObservableObject {
     
     public init(
         lineWrapping: Bool = false,
-        lineNumber: Bool = false,
+        lineNumber: Bool = true,
         foldGutter: Bool = false,
         readOnly: Bool = false,
         enabledSearch: Bool = false,
