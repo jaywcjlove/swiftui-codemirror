@@ -157,11 +157,13 @@ struct ContentView: View {
 
 ```swift
 struct ContentView: View {
+    @Environment(\.colorScheme) var colorScheme
     @State var theme: Themes = .vscodelight
     @State var value: String = ""
     var body: some View {
         CodeMirror(value: $value)
             .cmTheme($theme)
+            .cmTheme(colorScheme == .dark ? .constant(.vscodedark) : .constant(.vscodelight))
     }
 }
 ```
