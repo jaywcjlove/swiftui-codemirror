@@ -89,7 +89,7 @@ struct ContentView: View {
                         Spacer()
                         Picker("Lang", selection: $language) {
                             ForEach(Language.allCases, id: \.rawValue) {
-                                Text("Lang: \($0.rawValue)").tag($0)
+                                Text("\($0.name): .\($0.rawValue)").tag($0)
                             }
                         }
                         .labelsHidden()
