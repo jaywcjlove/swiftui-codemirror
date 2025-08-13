@@ -5,7 +5,13 @@
 //  Created by 王楚江 on 8/11/25.
 //
 
-import AppKit
+#if canImport(AppKit)
+import AppKit   // macOS
+#endif
+
+#if canImport(UIKit)
+import UIKit    // iOS / iPadOS
+#endif
 
 @MainActor
 public class CodeMirrorVM: ObservableObject {
