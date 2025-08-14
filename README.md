@@ -154,8 +154,7 @@ struct ContentView: View {
 }
 ```
 
-
-**Set enabled search**
+**Set Highlight Active Line**
 
 ```swift
 CodeMirror(value: $value)
