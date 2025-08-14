@@ -101,6 +101,12 @@ public struct CodeMirrorView: NativeView {
         )
         context.coordinator.queueJavascriptFunction(
             JavascriptFunction(
+                functionString: "CodeMirror.setHighlightActiveLine(value)",
+                args: ["value": vm.highlightActiveLine]
+            )
+        )
+        context.coordinator.queueJavascriptFunction(
+            JavascriptFunction(
                 functionString: "CodeMirror.setEnabledSearch(value)",
                 args: ["value": vm.enabledSearch]
             )

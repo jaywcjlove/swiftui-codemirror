@@ -141,6 +141,7 @@ const lineNumber = new Compartment();
 const foldGutterComp = new Compartment();
 const searchKeymapComp = new Compartment();
 const placeholderComp = new Compartment();
+const highlightActiveLineComp = new Compartment();
 
 const editorView = new CodeMirror.EditorView({
   doc: "",
@@ -157,7 +158,6 @@ const editorView = new CodeMirror.EditorView({
     autocompletion(),
     rectangularSelection(),
     crosshairCursor(),
-    highlightActiveLine(),
     highlightSelectionMatches(),
     keymap.of([
       ...closeBracketsKeymap,
@@ -167,6 +167,7 @@ const editorView = new CodeMirror.EditorView({
       ...completionKeymap,
       indentWithTab,
     ]),
+    highlightActiveLineComp.of([]),
     placeholderComp.of([]),
     searchKeymapComp.of([]),
     foldGutterComp.of([]),
@@ -259,6 +260,12 @@ function setEnabledSearch(enabled) {
   });
 }
 
+function setHighlightActiveLine(enabled) {
+  editorView.dispatch({
+    effects: highlightActiveLineComp.reconfigure(enabled ? [highlightActiveLine()] : []),
+  });
+}
+
 function setFoldGutter(enabled) {
   editorView.dispatch({
     effects: foldGutterComp.reconfigure(enabled ? foldGutter() : []),
@@ -284,6 +291,7 @@ export {
   setTheme,
   setLineWrapping,
   setLineNumber,
+  setHighlightActiveLine,
   setFoldGutter,
   setEnabledSearch,
   setFocus,

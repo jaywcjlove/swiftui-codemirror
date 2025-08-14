@@ -25,6 +25,11 @@ public struct CodeMirror: View {
             }
     }
     /// Set Line Wrapping
+    public func cmHighlightActiveLine(_ value: Binding<Bool>) -> CodeMirror {
+        vm.highlightActiveLine = value.wrappedValue
+        return self as CodeMirror
+    }
+    /// Set Line Wrapping
     public func cmLineWrapping(_ value: Binding<Bool>) -> CodeMirror {
         vm.lineWrapping = value.wrappedValue
         return self as CodeMirror

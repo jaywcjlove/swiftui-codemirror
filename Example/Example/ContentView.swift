@@ -18,6 +18,7 @@ struct ContentView: View {
     @State var value: String = jsonString
     @State var lineWrapping = false
     @State var lineNumber = true
+    @State var highlightActiveLine = true
     @State var foldGutter = false
     @State var readOnly = false
     @State var language: Language = .html
@@ -43,6 +44,7 @@ struct ContentView: View {
                 .cmReadOnly($readOnly)
                 .cmLanguage($language)
                 .cmEnabledSearch($enabledSearch)
+                .cmHighlightActiveLine($highlightActiveLine)
                 .cmTheme($theme)
                 .onLoadSuccess() {
                     print("Hello!")
@@ -67,6 +69,8 @@ struct ContentView: View {
                             Toggle(isOn: $readOnly, label: { Text("Read Only") })
                                 .toggleStyle(.checkbox)
                             Toggle(isOn: $enabledSearch, label: { Text("Enabled Search") })
+                                .toggleStyle(.checkbox)
+                            Toggle(isOn: $highlightActiveLine, label: { Text("Highlight Active Line") })
                                 .toggleStyle(.checkbox)
                         } label: {
                             Image(systemName: "gearshape.fill")

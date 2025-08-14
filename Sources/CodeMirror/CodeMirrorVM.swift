@@ -17,6 +17,7 @@ import UIKit    // iOS / iPadOS
 public class CodeMirrorVM: ObservableObject {
     @Published public var lineWrapping = false
     @Published public var lineNumber = true
+    @Published public var highlightActiveLine = true
     @Published public var foldGutter = false
     @Published public var readOnly = false
     @Published public var enabledSearch = false
@@ -35,6 +36,7 @@ public class CodeMirrorVM: ObservableObject {
     public init(
         lineWrapping: Bool = false,
         lineNumber: Bool = true,
+        highlightActiveLine: Bool = true,
         foldGutter: Bool = false,
         readOnly: Bool = false,
         enabledSearch: Bool = false,
@@ -44,6 +46,7 @@ public class CodeMirrorVM: ObservableObject {
     ) {
         self.lineWrapping = lineWrapping
         self.lineNumber = lineNumber
+        self.highlightActiveLine = highlightActiveLine
         self.foldGutter = foldGutter
         self.readOnly = readOnly
         self.enabledSearch = enabledSearch
