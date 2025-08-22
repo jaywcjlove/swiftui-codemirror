@@ -154,6 +154,13 @@ struct ContentView: View {
 }
 ```
 
+**Set Font Size**
+
+```swift
+CodeMirror(value: $value)
+    .cmFontSize(.constant(14))
+```
+
 **Set Highlight Active Line**
 
 ```swift
