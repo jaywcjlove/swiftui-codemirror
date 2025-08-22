@@ -64,6 +64,11 @@ public struct CodeMirror: View {
         vm.theme = value.wrappedValue
         return self as CodeMirror
     }
+    /// Set Font Size
+    public func cmFontSize(_ value: Binding<CGFloat>) -> CodeMirror {
+        vm.fontSize = value.wrappedValue
+        return self as CodeMirror
+    }
     public func onLoadSuccess(perform action: (() -> Void)? = nil) -> CodeMirror {
         vm.onLoadSuccess = action
         return self as CodeMirror

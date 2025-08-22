@@ -24,6 +24,7 @@ public class CodeMirrorVM: ObservableObject {
     @Published public var language: Language = .json
     @Published public var theme: Themes = .vscodelight
     @Published public var placeholder: String = ""
+    @Published public var fontSize: CGFloat = 14
     
     @Published public var focused = false
     
@@ -42,7 +43,8 @@ public class CodeMirrorVM: ObservableObject {
         enabledSearch: Bool = false,
         placeholder: String = "",
         language: Language = .json,
-        theme: Themes = .vscodedark
+        theme: Themes = .vscodedark,
+        fontSize: CGFloat = 14
     ) {
         self.lineWrapping = lineWrapping
         self.lineNumber = lineNumber
@@ -53,6 +55,7 @@ public class CodeMirrorVM: ObservableObject {
         self.placeholder = placeholder
         self.language = language
         self.theme = theme
+        self.fontSize = fontSize
     }
     
     private func executeJSAsync<T>(f: JavascriptFunction) async throws -> T? where T: Sendable {

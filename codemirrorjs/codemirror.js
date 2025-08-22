@@ -132,6 +132,15 @@ const baseTheme = EditorView.baseTheme({
   },
 });
 
+const fontSizeTheme = (size = 14) => {
+  const baseStyle = {
+    '&': {
+      fontSize: size + "px",
+    }
+  };
+  return EditorView.theme(baseStyle);
+};
+
 const theme = new Compartment();
 const language = new Compartment();
 const listener = new Compartment();
@@ -142,6 +151,7 @@ const foldGutterComp = new Compartment();
 const searchKeymapComp = new Compartment();
 const placeholderComp = new Compartment();
 const highlightActiveLineComp = new Compartment();
+const fontSizeComp = new Compartment();
 
 const editorView = new CodeMirror.EditorView({
   doc: "",
@@ -175,6 +185,7 @@ const editorView = new CodeMirror.EditorView({
     lineWrapping.of([]),
     lineNumber.of([]),
     baseTheme,
+    fontSizeComp.of(fontSizeTheme(14)),
     theme.of(oneDark),
     language.of([]),
     listener.of([]),
@@ -272,6 +283,12 @@ function setFoldGutter(enabled) {
   });
 }
 
+function setFontSize(size) {
+  editorView.dispatch({
+    effects: fontSizeComp.reconfigure(fontSizeTheme(size)),
+  });
+}
+
 function setFocus() {
   editorView.focus();
 }
@@ -296,5 +313,6 @@ export {
   setEnabledSearch,
   setFocus,
   setBlur,
+  setFontSize,
   editorView,
 };

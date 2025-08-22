@@ -24,6 +24,7 @@ struct ContentView: View {
     @State var language: Language = .html
     @State var theme: Themes = .vscodedark
     @State var enabledSearch = false
+    @State var fontSize: CGFloat = 14
     @State var count: Int = 0
     @FocusState var input: InputFocused?
     @State private var textForTextField: String = ""
@@ -46,6 +47,7 @@ struct ContentView: View {
                 .cmEnabledSearch($enabledSearch)
                 .cmHighlightActiveLine($highlightActiveLine)
                 .cmTheme($theme)
+                .cmFontSize($fontSize)
                 .onLoadSuccess() {
                     print("Hello!")
                 }
@@ -89,6 +91,15 @@ struct ContentView: View {
                             self.input = .text
                         } label: {
                             Text("Focused text")
+                        }
+                        VStack {
+                            HStack {
+                                Button("A-") { if fontSize > 8 { fontSize -= 1 } }
+                                Button("A+") { if fontSize < 24 { fontSize += 1 } }
+                                Text("Font: \(Int(fontSize))px")
+                                    .font(.caption)
+                            }
+                            .font(.caption)
                         }
                         Spacer()
                         Picker("Lang", selection: $language) {

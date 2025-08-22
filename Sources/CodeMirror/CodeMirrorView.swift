@@ -125,6 +125,12 @@ public struct CodeMirrorView: NativeView {
         )
         context.coordinator.queueJavascriptFunction(
             JavascriptFunction(
+                functionString: "CodeMirror.setFontSize(value)",
+                args: ["value": vm.fontSize]
+            )
+        )
+        context.coordinator.queueJavascriptFunction(
+            JavascriptFunction(
                 functionString: vm.focused == true ? "CodeMirror.setFocus()" : "CodeMirror.setBlur()",
                 args: [:]
             )
