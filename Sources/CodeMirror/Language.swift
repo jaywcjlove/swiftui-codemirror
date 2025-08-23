@@ -5,7 +5,8 @@
 //  Created by wong on 8/13/25.
 //
 
-public enum Language: String, CaseIterable, Hashable {
+public enum Language: String, CaseIterable, Hashable, Identifiable {
+    public var id: String { rawValue }
     case troff1 = "1"
     case troff2 = "2"
     case troff3 = "3"

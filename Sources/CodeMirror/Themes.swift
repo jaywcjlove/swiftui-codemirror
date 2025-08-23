@@ -5,7 +5,8 @@
 //  Created by wong on 8/13/25.
 //
 
-public enum Themes: String, CaseIterable, Hashable {
+public enum Themes: String, CaseIterable, Hashable, Identifiable {
+    public var id: String { rawValue }
     case abcdef
     case abyss
     case androidstudio
