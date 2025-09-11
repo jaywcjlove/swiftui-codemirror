@@ -69,78 +69,130 @@ public struct CodeMirrorView: NativeView {
     }
     
     private func updateWebView(context: Context) {
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setTheme(value)",
-                args: ["value": vm.theme.rawValue]
+        let vm = self.vm
+        let coordinator = context.coordinator
+        
+        // 只在值真正改变时才更新
+        if coordinator.lastTheme != vm.theme {
+            coordinator.lastTheme = vm.theme
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setTheme(value)",
+                    args: ["value": vm.theme.rawValue]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setLineWrapping(value)",
-                args: ["value": vm.lineWrapping]
+        }
+        
+        if coordinator.lastLineWrapping != vm.lineWrapping {
+            coordinator.lastLineWrapping = vm.lineWrapping
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setLineWrapping(value)",
+                    args: ["value": vm.lineWrapping]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setLineNumber(value)",
-                args: ["value": vm.lineNumber]
+        }
+        
+        if coordinator.lastLineNumber != vm.lineNumber {
+            coordinator.lastLineNumber = vm.lineNumber
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setLineNumber(value)",
+                    args: ["value": vm.lineNumber]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setFoldGutter(value)",
-                args: ["value": vm.foldGutter]
+        }
+        
+        if coordinator.lastFoldGutter != vm.foldGutter {
+            coordinator.lastFoldGutter = vm.foldGutter
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setFoldGutter(value)",
+                    args: ["value": vm.foldGutter]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setReadOnly(value)",
-                args: ["value": vm.readOnly]
+        }
+        
+        if coordinator.lastReadOnly != vm.readOnly {
+            coordinator.lastReadOnly = vm.readOnly
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setReadOnly(value)",
+                    args: ["value": vm.readOnly]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setHighlightActiveLine(value)",
-                args: ["value": vm.highlightActiveLine]
+        }
+        
+        if coordinator.lastHighlightActiveLine != vm.highlightActiveLine {
+            coordinator.lastHighlightActiveLine = vm.highlightActiveLine
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setHighlightActiveLine(value)",
+                    args: ["value": vm.highlightActiveLine]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setEnabledSearch(value)",
-                args: ["value": vm.enabledSearch]
+        }
+        
+        if coordinator.lastEnabledSearch != vm.enabledSearch {
+            coordinator.lastEnabledSearch = vm.enabledSearch
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setEnabledSearch(value)",
+                    args: ["value": vm.enabledSearch]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setLanguage(value)",
-                args: ["value": vm.language.rawValue]
+        }
+        
+        if coordinator.lastLanguage != vm.language {
+            coordinator.lastLanguage = vm.language
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setLanguage(value)",
+                    args: ["value": vm.language.rawValue]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setPlaceholder(value)",
-                args: ["value": vm.placeholder]
+        }
+        
+        if coordinator.lastPlaceholder != vm.placeholder {
+            coordinator.lastPlaceholder = vm.placeholder
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setPlaceholder(value)",
+                    args: ["value": vm.placeholder]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setFontSize(value)",
-                args: ["value": vm.fontSize]
+        }
+        
+        if coordinator.lastFontSize != vm.fontSize {
+            coordinator.lastFontSize = vm.fontSize
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setFontSize(value)",
+                    args: ["value": vm.fontSize]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: vm.focused == true ? "CodeMirror.setFocus()" : "CodeMirror.setBlur()",
-                args: [:]
+        }
+        
+        if coordinator.lastFocused != vm.focused {
+            coordinator.lastFocused = vm.focused
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: vm.focused == true ? "CodeMirror.setFocus()" : "CodeMirror.setBlur()",
+                    args: [:]
+                )
             )
-        )
-        context.coordinator.queueJavascriptFunction(
-            JavascriptFunction(
-                functionString: "CodeMirror.setContent(value)",
-                args: ["value": value]
+        }
+        
+        // 内容更新：只在外部值变化且不是来自编辑器本身时才更新
+        if coordinator.lastValue != value {
+            coordinator.lastValue = value
+            coordinator.queueJavascriptFunction(
+                JavascriptFunction(
+                    functionString: "CodeMirror.setContent(value)",
+                    args: ["value": value]
+                )
             )
-        )
+        }
     }
     public func makeCoordinator() -> Coordinator {
         let coordinator = Coordinator(parent: self, viewModel: vm)
@@ -159,6 +211,20 @@ public class Coordinator: NSObject {
     var webView: WKWebView!
     private var pageLoaded = false
     private var pendingFunctions = [(JavascriptFunction, JavascriptCallback?)]()
+    
+    // 缓存上次的值，避免重复更新
+    internal var lastTheme: Themes?
+    internal var lastLineWrapping: Bool?
+    internal var lastLineNumber: Bool?
+    internal var lastFoldGutter: Bool?
+    internal var lastReadOnly: Bool?
+    internal var lastHighlightActiveLine: Bool?
+    internal var lastEnabledSearch: Bool?
+    internal var lastLanguage: Language?
+    internal var lastPlaceholder: String?
+    internal var lastFontSize: CGFloat?
+    internal var lastFocused: Bool?
+    internal var lastValue: String?
 
     init(parent: CodeMirrorView, viewModel: CodeMirrorVM) {
         self.parent = parent
@@ -228,6 +294,8 @@ extension Coordinator: WKScriptMessageHandler {
             callPendingFunctions()
         case ScriptMessageName.codeMirrorContentDidChange:
             if let messageBody = message.body as? String {
+                // 同时更新缓存值，避免循环更新
+                lastValue = messageBody
                 parent.value = messageBody
                 parent.vm.onContentChange?(messageBody)
             }
@@ -239,7 +307,7 @@ extension Coordinator: WKScriptMessageHandler {
 
 extension Coordinator: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        parent.vm.setContent(parent.value)
+        parent.vm.setContentImmediately(parent.value)
         parent.vm.onLoadSuccess?()
     }
 
@@ -305,7 +373,6 @@ extension Coordinator: WKNavigationDelegate {
                         Text("GET")
                     }
                 }
-                
             }
     }
 }

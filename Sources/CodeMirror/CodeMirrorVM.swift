@@ -13,6 +13,8 @@ import AppKit   // macOS
 import UIKit    // iOS / iPadOS
 #endif
 
+import Foundation
+
 @MainActor
 public class CodeMirrorVM: ObservableObject {
     @Published public var lineWrapping = false
@@ -33,6 +35,10 @@ public class CodeMirrorVM: ObservableObject {
     public var onContentChange: ((_ value: String) -> Void)?
     
     internal var executeJS: ((JavascriptFunction, JavascriptCallback?) -> Void)!
+    
+    // 添加防抖机制
+    private var setContentTimer: Timer?
+    private let setContentDebounceDelay: TimeInterval = 0.1
     
     public init(
         lineWrapping: Bool = false,
@@ -73,6 +79,28 @@ public class CodeMirrorVM: ObservableObject {
         )
     }
     public func setContent(_ value: String) {
+        // 取消之前的定时器
+        setContentTimer?.invalidate()
+        
+        // 捕获 value 参数以避免在闭包中访问 actor 隔离的属性
+        let capturedValue = value
+        
+        // 创建新的防抖定时器
+        setContentTimer = Timer.scheduledTimer(withTimeInterval: setContentDebounceDelay, repeats: false) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.executeJS(
+                    JavascriptFunction(
+                        functionString: "CodeMirror.setContent(value)",
+                        args: ["value": capturedValue]
+                    ),
+                    nil
+                )
+            }
+        }
+    }
+    
+    // 立即设置内容，用于初始化时不需要防抖
+    internal func setContentImmediately(_ value: String) {
         executeJS(
             JavascriptFunction(
                 functionString: "CodeMirror.setContent(value)",
