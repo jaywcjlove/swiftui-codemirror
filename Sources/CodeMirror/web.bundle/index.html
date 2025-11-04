@@ -5,21 +5,55 @@
     <meta name="viewport" content="initial-scale=1">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
     <style>
-      html, body { margin: 0px; padding: 0px; width: 100%; height: 100%; }
-      body { user-select: none; -webkit-user-select: none; }
-      .cm-editor { width: 100%; height: 100%; }
-      .cm-scroller { overflow: auto; }
+      html, body { 
+        margin: 0px; 
+        padding: 0px; 
+        width: 100%; 
+        height: 100%; 
+        /* 优化渲染性能 */
+        will-change: transform;
+        contain: layout;
+      }
+      body { 
+        user-select: none; 
+        -webkit-user-select: none;
+        /* 减少重绘 */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .cm-editor { 
+        width: 100%; 
+        height: 100%;
+        /* 优化滚动性能 */
+        will-change: scroll-position;
+      }
+      .cm-scroller { 
+        overflow: auto;
+        /* 启用硬件加速 */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+      }
     </style>
   </head>
   <body>
     <script src="./codemirror.bundle.js"></script>
     <script>
-      if (window.webkit) {
-        window.webkit.messageHandlers.codeMirrorDidReady.postMessage(null);
-        CodeMirror.setListener(() => {
-            let code = CodeMirror.getContent();
-            window.webkit.messageHandlers.codeMirrorContentDidChange.postMessage(code);
-        });
+      // 使用 requestIdleCallback 来延迟非关键初始化
+      function initializeCodeMirror() {
+        if (window.webkit) {
+          window.webkit.messageHandlers.codeMirrorDidReady.postMessage(null);
+          CodeMirror.setListener(() => {
+              let code = CodeMirror.getContent();
+              window.webkit.messageHandlers.codeMirrorContentDidChange.postMessage(code);
+          });
+        }
+      }
+      
+      // 优先使用 requestIdleCallback，如果不支持则回退到 setTimeout
+      if (window.requestIdleCallback) {
+        requestIdleCallback(initializeCodeMirror, { timeout: 100 });
+      } else {
+        setTimeout(initializeCodeMirror, 0);
       }
     </script>
   </body>

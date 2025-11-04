@@ -56,26 +56,53 @@ public struct CodeMirrorView: NativeView {
         #elseif os(iOS)
             webView.isOpaque = false
         #endif
-        let indexURL = Bundle.module.url(
-            forResource: "index",
-            withExtension: "html",
-            subdirectory: "web.bundle"
-        )
-        let baseURL = Bundle.module.url(forResource: "web.bundle", withExtension: nil)
-        let data = try! Data.init(contentsOf: indexURL!)
-        webView.load(data, mimeType: "text/html", characterEncodingName: "utf-8", baseURL: baseURL!)
+        
         context.coordinator.webView = webView
+        
+        // 异步加载 HTML 内容，避免阻塞主线程
+        Task { @MainActor in
+            await loadWebViewContent(webView: webView)
+        }
+        
         return webView
+    }
+    
+    @MainActor
+    private func loadWebViewContent(webView: WKWebView) async {
+        let result = await Task.detached { () -> (data: Data?, baseURL: URL?, mimeType: String?) in
+            guard let indexURL = Bundle.module.url(
+                forResource: "index",
+                withExtension: "html",
+                subdirectory: "web.bundle"
+            ),
+            let baseURL = Bundle.module.url(forResource: "web.bundle", withExtension: nil),
+            let data = try? Data(contentsOf: indexURL) else {
+                return (data: nil, baseURL: nil, mimeType: nil)
+            }
+            return (data: data, baseURL: baseURL, mimeType: "text/html")
+        }.value
+        
+        if let data = result.data, 
+           let baseURL = result.baseURL, 
+           let mimeType = result.mimeType {
+            webView.load(data, mimeType: mimeType, characterEncodingName: "utf-8", baseURL: baseURL)
+        }
     }
     
     private func updateWebView(context: Context) {
         let vm = self.vm
         let coordinator = context.coordinator
         
-        // 只在值真正改变时才更新
+        // 如果 WebView 还没有准备好，延迟更新
+        guard coordinator.webView != nil else { return }
+        
+        // 批量收集需要更新的配置，减少单独的 JS 调用
+        var pendingUpdates: [JavascriptFunction] = []
+        
+        // 主题更新
         if coordinator.lastTheme != vm.theme {
             coordinator.lastTheme = vm.theme
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setTheme(value)",
                     args: ["value": vm.theme.rawValue]
@@ -83,9 +110,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 行包装更新
         if coordinator.lastLineWrapping != vm.lineWrapping {
             coordinator.lastLineWrapping = vm.lineWrapping
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setLineWrapping(value)",
                     args: ["value": vm.lineWrapping]
@@ -93,9 +121,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 行号更新
         if coordinator.lastLineNumber != vm.lineNumber {
             coordinator.lastLineNumber = vm.lineNumber
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setLineNumber(value)",
                     args: ["value": vm.lineNumber]
@@ -103,9 +132,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 折叠装订线更新
         if coordinator.lastFoldGutter != vm.foldGutter {
             coordinator.lastFoldGutter = vm.foldGutter
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setFoldGutter(value)",
                     args: ["value": vm.foldGutter]
@@ -113,9 +143,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 只读状态更新
         if coordinator.lastReadOnly != vm.readOnly {
             coordinator.lastReadOnly = vm.readOnly
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setReadOnly(value)",
                     args: ["value": vm.readOnly]
@@ -123,9 +154,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 高亮当前行更新
         if coordinator.lastHighlightActiveLine != vm.highlightActiveLine {
             coordinator.lastHighlightActiveLine = vm.highlightActiveLine
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setHighlightActiveLine(value)",
                     args: ["value": vm.highlightActiveLine]
@@ -133,9 +165,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 搜索功能更新
         if coordinator.lastEnabledSearch != vm.enabledSearch {
             coordinator.lastEnabledSearch = vm.enabledSearch
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setEnabledSearch(value)",
                     args: ["value": vm.enabledSearch]
@@ -143,9 +176,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 语言更新
         if coordinator.lastLanguage != vm.language {
             coordinator.lastLanguage = vm.language
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setLanguage(value)",
                     args: ["value": vm.language.rawValue]
@@ -153,9 +187,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 占位符更新
         if coordinator.lastPlaceholder != vm.placeholder {
             coordinator.lastPlaceholder = vm.placeholder
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setPlaceholder(value)",
                     args: ["value": vm.placeholder]
@@ -163,9 +198,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 字体大小更新
         if coordinator.lastFontSize != vm.fontSize {
             coordinator.lastFontSize = vm.fontSize
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: "CodeMirror.setFontSize(value)",
                     args: ["value": vm.fontSize]
@@ -173,9 +209,10 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 焦点状态更新
         if coordinator.lastFocused != vm.focused {
             coordinator.lastFocused = vm.focused
-            coordinator.queueJavascriptFunction(
+            pendingUpdates.append(
                 JavascriptFunction(
                     functionString: vm.focused == true ? "CodeMirror.setFocus()" : "CodeMirror.setBlur()",
                     args: [:]
@@ -183,15 +220,29 @@ public struct CodeMirrorView: NativeView {
             )
         }
         
+        // 批量执行配置更新，降低单次调用的频率
+        if !pendingUpdates.isEmpty {
+            Task { @MainActor in
+                // 使用微延迟，避免阻塞 UI
+                try? await Task.sleep(nanoseconds: 1_000_000) // 1ms
+                for update in pendingUpdates {
+                    coordinator.queueJavascriptFunction(update)
+                }
+            }
+        }
+        
         // 内容更新：只在外部值变化且不是来自编辑器本身时才更新
         if coordinator.lastValue != value {
             coordinator.lastValue = value
-            coordinator.queueJavascriptFunction(
-                JavascriptFunction(
-                    functionString: "CodeMirror.setContent(value)",
-                    args: ["value": value]
+            // 内容更新使用更高优先级，但也异步执行
+            Task { @MainActor in
+                coordinator.queueJavascriptFunction(
+                    JavascriptFunction(
+                        functionString: "CodeMirror.setContent(value)",
+                        args: ["value": value]
+                    )
                 )
-            )
+            }
         }
     }
     public func makeCoordinator() -> Coordinator {
@@ -225,6 +276,10 @@ public class Coordinator: NSObject {
     internal var lastFontSize: CGFloat?
     internal var lastFocused: Bool?
     internal var lastValue: String?
+    
+    // 添加队列来批量处理 JavaScript 调用
+    private var jsQueue = DispatchQueue(label: "codemirror.js.queue", qos: .userInitiated)
+    private var jsExecutionTimer: Timer?
 
     init(parent: CodeMirrorView, viewModel: CodeMirrorVM) {
         self.parent = parent
@@ -236,7 +291,11 @@ public class Coordinator: NSObject {
         callback: JavascriptCallback? = nil
     ) {
         if pageLoaded {
-            evaluateJavascript(function: function, callback: callback)
+            // 使用微延迟执行，避免阻塞主线程
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 100_000) // 0.1ms
+                self.evaluateJavascript(function: function, callback: callback)
+            }
         }
         else {
             pendingFunctions.append((function, callback))
@@ -244,16 +303,24 @@ public class Coordinator: NSObject {
     }
     
     private func callPendingFunctions() {
-        for (function, callback) in pendingFunctions {
-            evaluateJavascript(function: function, callback: callback)
+        // 异步批量执行待处理的函数，避免阻塞页面加载
+        Task { @MainActor in
+            for (function, callback) in pendingFunctions {
+                evaluateJavascript(function: function, callback: callback)
+                // 在函数之间添加微小延迟，防止 WebView 过载
+                try? await Task.sleep(nanoseconds: 500_000) // 0.5ms
+            }
+            pendingFunctions.removeAll()
         }
-        pendingFunctions.removeAll()
     }
 
     private func evaluateJavascript(
         function: JavascriptFunction,
         callback: JavascriptCallback? = nil
     ) {
+        // 确保 WebView 存在
+        guard let webView = webView else { return }
+        
         // not sure why but callAsyncJavaScript always callback with result of nil
         if let callback = callback {
             webView.evaluateJavaScript(function.functionString) { (response, error) in
@@ -307,8 +374,12 @@ extension Coordinator: WKScriptMessageHandler {
 
 extension Coordinator: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        parent.vm.setContentImmediately(parent.value)
-        parent.vm.onLoadSuccess?()
+        // 异步设置初始内容，避免阻塞主线程
+        Task { @MainActor in
+            parent.vm.setContentImmediately(parent.value)
+            parent.vm.markAsInitialized()
+            parent.vm.onLoadSuccess?()
+        }
     }
 
     public func webView(

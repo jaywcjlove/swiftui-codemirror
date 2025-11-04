@@ -36,9 +36,10 @@ public class CodeMirrorVM: ObservableObject {
     
     internal var executeJS: ((JavascriptFunction, JavascriptCallback?) -> Void)!
     
-    // 添加防抖机制
+    // 添加防抖机制和初始化状态跟踪
     private var setContentTimer: Timer?
     private let setContentDebounceDelay: TimeInterval = 0.1
+    private var isInitialized = false
     
     public init(
         lineWrapping: Bool = false,
@@ -79,6 +80,12 @@ public class CodeMirrorVM: ObservableObject {
         )
     }
     public func setContent(_ value: String) {
+        // 如果是初始化阶段，使用立即设置避免延迟
+        if !isInitialized {
+            setContentImmediately(value)
+            return
+        }
+        
         // 取消之前的定时器
         setContentTimer?.invalidate()
         
@@ -108,5 +115,10 @@ public class CodeMirrorVM: ObservableObject {
             ),
             nil
         )
+    }
+    
+    // 标记为已初始化
+    internal func markAsInitialized() {
+        isInitialized = true
     }
 }
